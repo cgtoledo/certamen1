@@ -66,15 +66,16 @@ function validateMiddleware(req, res, next) { // Middleware de validación
 
 
     
-    const userIndex = users.findIndex((u) => u.username == usuario)
-
-    if (userIndex == -1) {
-        console.log(" error en la validacion")
-        return res.status(401).send();
-    } else {
-        console.log()
-        next();
-    }
+// de revisa si el usuario no se encontró en la matriz
+if (userIndex == -1) {
+    console.log("Error en la validación: el usuario no fue encontrado en la lista de usuarios.");
+    // si  no se encuentra, imprime u mensaje de error y devuelve  código de estado 401 
+    return res.status(401).send();
+} else {
+    // si el  usuario esta en la lista de usuarios
+    console.log(); 
+    next();
+}
 }
 
 // hello
@@ -108,10 +109,11 @@ app.post('/api/login', async (req, res) => { // Ruta para el inicio de sesión
 			 // valida la contraseña
             const isValidCredentials = validarContraseña(passwordInput, users[indiceUsuario].password);
             if (!isValidCredentials) {
-				// Si  credenciales no son válidas, se devuelve un error 401
+		// Si  credenciales no son válidas, se devuelve un error 401
                 res.status(401).send("El usuario y/o contraseña son incorrectos"); 
             } else {
-                const resultado = { // Si credenciales son válidas, se prepara la respuesta con el nombre de usuario y un token de portador
+	// Si credenciales son válidas, prepara respuesta con el nombre de usuario y un token 
+                const resultado = { 
                     username: users[indiceUsuario].username,
                     name: users[indiceUsuario].name,
                     token: generarBearerToken(users[indiceUsuario].username)
@@ -155,9 +157,9 @@ app.post("/api/todos", (req, res) => {
             completed: false // Estado de completado inicialmente establecido en falso
         }
 
-        todos.push(todo); // Se agrega el nuevo elemento a la lista 'todos'
+        todos.push(t); // Se agrega el nuevo elemento a la lista 'todos'
 
-        res.status(201).send(todo); // Se responde con el nuevo elemento creado y un código de estado 201 (creado)
+        res.status(201).send(t); // Se responde con el nuevo elemento creado y un código de estado 201 (creado)
     } catch (err) {
         res.status(400); // Si hay un error, se devuelve un código de estado 400 (solicitud incorrecta)
     } 
@@ -174,15 +176,15 @@ app.put("/api/todos/:id", (req, res) => {
     try {
         const todoIndex = todos.findIndex(todo => todo.id == id); // Se encuentra el índice del elemento con el ID dado
 
-        const todo = { // Se crea un nuevo objeto 'todo' con el mismo ID, pero con el título y estado de completado actualizados
+        const t = { // Se crea un nuevo objeto 'todo' con el mismo ID, pero con el título y estado de completado actualizados
             id: id, // Se mantiene el mismo ID
             title: title || todos[todoIndex].title, // Si no se proporciona un nuevo título, se conserva el anterior
             completed: completed || todos[todoIndex].completed // Si no se proporciona un nuevo estado de completado, se conserva el anterior
         };
 
-        todos[todoIndex] = todo; // Se actualiza el elemento en la lista 'todos' con el nuevo objeto 'todo'
+        todos[todoIndex] = t; // Se actualiza el elemento en la lista 'todos' con el nuevo objeto 'todo'
 
-        return res.status(200).send(todo); // Se responde con el elemento actualizado y un código de estado 200 (éxito)
+        return res.status(200).send(t); // Se responde con el elemento actualizado y un código de estado 200 (éxito)
     } catch (error) {
         return res.status(400).send(); // Si hay un error, se devuelve un código de estado 400 (solicitud incorrecta)
     }
@@ -193,7 +195,7 @@ app.delete("/api/todos/:id", (req, res) => {
     const id = req.params.id; // Se obtiene el ID del elemento a eliminar de la solicitud
 
     try {
-        const todoIndex = todos.findIndex(todo => todo.id == id); // Se encuentra el índice del elemento con el ID dado
+        const todoIndex = todos.findIndex(t => t.id == id); // Se encuentra el índice del elemento con el ID dado
         todos.splice(todoIndex, 1); // Se elimina el elemento de la lista 'todos'
 
         return res.status(204).send(); // Se responde con un código de estado 204 (sin contenido) para indicar que la eliminación se realizó con éxito
